@@ -1,0 +1,21 @@
+Admin Hub Page 1:
+
+Take quiz
+Create
+Edit 
+Delete
+Next page
+
+Admin Hub Page 2:
+
+System Config
+Scoreboard Config
+User stats
+Log out
+Previous Page	
+
+Button Layout:
+
+- -
+- -
+ -

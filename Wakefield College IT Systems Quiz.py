@@ -725,6 +725,7 @@ class Quiz:
         global newHint
         global tries
         global questionNumber
+        global totalTries
 
         #Sound the hard coding alarm!!! Fixing this would be a whole different can of worms that I dare not touch.
         selectSection = random.randint(0,6)
@@ -742,7 +743,8 @@ class Quiz:
             selectQuestion = random.randint(25,29)
         elif sections[selectSection] == "Section G - Issues Caused by IT Systems":
             selectQuestion = random.randint(30,34)
-        tries = systemConfigDataFrame.iloc[1]["Data"]
+        totalTries = systemConfigDataFrame.iloc[1]["Data"]
+        tries = totalTries
         newSection = sections[selectSection]
         try:
             newQuestion = questions[selectQuestion].replace("\\n", "\n")
@@ -813,14 +815,14 @@ class Quiz:
         global answeredCorrectly
         userAnswer = answerInput.get()
         if userAnswer.lower() == newAnswer.lower():
-            if tries == 0:
+            if tries == totalTries:
                 score += 3
-            elif tries == 1:
+            elif tries < totalTries and tries > 0:
                 score += 1
             answeredCorrectly += 1
             Quiz.AnswerResults("Correct!")
         else:
-            tries += 1
+            tries -= 1
             Quiz.AnswerResults("Incorrect!")
 
     def AnswerResults(results):
@@ -828,16 +830,16 @@ class Quiz:
         global usedSkips
         Miscellaneous.DestroyFrame()
         banner = tkinter.Label(frame, text = unitName + " Quiz: Statement " + str(questionNumber) + " Results", font = "calibri 18 bold", bg = blue, width = 46, height = 1)
-        if results == "Correct!" and tries == 0 and questionNumber != 10:
+        if results == "Correct!" and tries == totalTries and questionNumber != 10:
             resultsLabel = tkinter.Label(frame, text = "\n" + results + "!\nYou get three points.\nTotal Points: " + str(score), font = "calibri 15 bold", fg = textForeground, bg = textBackground)
-        elif results == "Correct!" and tries == 1 and questionNumber != 10:
+        elif results == "Correct!" and tries < totalTries and tries > 0 and questionNumber != 10:
             resultsLabel = tkinter.Label(frame, text = "\n" + results + "!\nYou get one point.\nTotal Points: " + str(score), font = "calibri 15 bold", fg = textForeground, bg = textBackground)
         elif results == "Correct!" and questionNumber == 10:
             resultsLabel = tkinter.Label(frame, text = "\n" + results + "\nYou filled in all of the statements correctly!\nWell done!", font = "calibri 15 bold", fg = textForeground, bg = textBackground)
-        elif results == "Incorrect!" and tries == 1 or results == "Incorrect" and questionNumber == 11 and tries == 1:
-            resultsLabel = tkinter.Label(frame, text = "\n" + results + "\nTry again.\nTries: 1/2.", font = "calibri 15 bold", fg = textForeground, bg = textBackground)
+        elif results == "Incorrect!" and tries < totalTries and tries > 0 or results == "Incorrect" and questionNumber == 11 and tries < totalTries and tries > 0:
+            resultsLabel = tkinter.Label(frame, text = "\n" + results + "\nTry again.\nYou have " + str(tries) + " try/tries left.", font = "calibri 15 bold", fg = textForeground, bg = textBackground)
             resultsButton = tkinter.Button(frame, text = "Try\nAgain", font = "calibri 15 bold", command = Quiz.QuizScreen, bg = green)
-        elif results == "Incorrect!" and tries == 2:
+        elif results == "Incorrect!" and tries == 0:
             resultsLabel = tkinter.Label(frame, text = "\n" + results + "\nThe answer was: " + newAnswer + "\n\nYou failed to fill in the statement correctly twice!\nGame over!", font = "calibri 15 bold", fg = textForeground, bg = textBackground)
         elif results == "Skipped":
             usedSkips += 1
@@ -847,7 +849,7 @@ class Quiz:
 
         if results == "Correct!" and questionNumber != 10 or results == "Skipped":
             resultsButton = tkinter.Button(frame, text = "Next\nStatement", command = Quiz.GenerateQuestion, font = "calibri 15 bold", bg = green)
-        elif results == "Incorrect!" and tries == 2 or results == "Correct!" and questionNumber == 10:
+        elif results == "Incorrect!" and tries == 0 or results == "Correct!" and questionNumber == 10:
             quizEnd = True
             resultsButton = tkinter.Button(frame, text = "View\nResults", font = "calibri 15 bold", command = Quiz.RecordUserStats, bg = green)
         
